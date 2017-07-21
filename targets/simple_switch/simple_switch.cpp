@@ -170,8 +170,9 @@ struct my_hash10 {
 struct my_stupid_hash {
   uint32_t operator()(const char *buf, size_t s) const {
     uint32_t stupid_res = 2;
+    s = s; // to avoid warning ..
     return stupid_res;
-    }
+  }
 };
 
 }  // namespace
