@@ -171,6 +171,7 @@ struct my_stupid_hash {
   uint32_t operator()(const char *buf, size_t s) const {
     uint32_t stupid_res = 2;
     s = s; // to avoid warning ..
+    buf = buf;
     return stupid_res;
   }
 };
