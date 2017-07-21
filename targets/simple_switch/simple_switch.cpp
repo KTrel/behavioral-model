@@ -167,6 +167,12 @@ struct my_hash10 {
   }
 };
 
+struct my_stupid_hash {
+  uint32_t operator()(const char *buf, size_t s) const {
+    uint32_t stupid_res = 2;
+    return stupid_res;
+    }
+};
 
 }  // namespace
 
@@ -185,6 +191,7 @@ REGISTER_HASH(my_hash7);
 REGISTER_HASH(my_hash8);
 REGISTER_HASH(my_hash9);
 REGISTER_HASH(my_hash10);
+REGISTER_HASH(my_stupid_hash);
 
 extern int import_primitives();
 
