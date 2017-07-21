@@ -30,6 +30,58 @@
 
 #include "simple_switch.h"
 
+#define ROT32(x, y) ((x << y) | (x >> (32 - y))) // avoid effort
+static inline uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) {
+	static const uint32_t c1 = 0xcc9e2d51;
+	static const uint32_t c2 = 0x1b873593;
+	static const uint32_t r1 = 15;
+	static const uint32_t r2 = 13;
+	static const uint32_t m = 5;
+	static const uint32_t n = 0xe6546b64;
+
+	uint32_t hash = seed;
+
+	const int nblocks = len / 4;
+	const uint32_t *blocks = (const uint32_t *) key;
+	int i;
+	uint32_t k;
+	for (i = 0; i < nblocks; i++) {
+		k = blocks[i];
+		k *= c1;
+		k = ROT32(k, r1);
+		k *= c2;
+
+		hash ^= k;
+		hash = ROT32(hash, r2) * m + n;
+	}
+
+	const uint8_t *tail = (const uint8_t *) (key + nblocks * 4);
+	uint32_t k1 = 0;
+
+	switch (len & 3) {
+		case 3:
+			k1 ^= tail[2] << 16;
+		case 2:
+			k1 ^= tail[1] << 8;
+		case 1:
+			k1 ^= tail[0];
+
+			k1 *= c1;
+			k1 = ROT32(k1, r1);
+			k1 *= c2;
+			hash ^= k1;
+	}
+
+	hash ^= len;
+	hash ^= (hash >> 16);
+	hash *= 0x85ebca6b;
+	hash ^= (hash >> 13);
+	hash *= 0xc2b2ae35;
+	hash ^= (hash >> 16);
+
+	return hash;
+}
+
 namespace {
 
 struct hash_ex {
@@ -55,12 +107,84 @@ struct bmv2_hash {
   }
 };
 
+struct my_hash1 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 1);
+  }
+};
+
+struct my_hash2 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 2);
+  }
+};
+
+struct my_hash3 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 3);
+  }
+};
+
+struct my_hash4 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 4);
+  }
+};
+
+struct my_hash5 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 5);
+  }
+};
+
+struct my_hash6 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 6);
+  }
+};
+
+struct my_hash7 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 7);
+  }
+};
+
+struct my_hash8 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 8);
+  }
+};
+
+struct my_hash9 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 9);
+  }
+};
+
+struct my_hash10 {
+  uint32_t operator()(const char *buf, size_t s) const {
+    return murmur3_32(buf, s, 10);
+  }
+};
+
+
 }  // namespace
 
 // if REGISTER_HASH calls placed in the anonymous namespace, some compiler can
 // give an unused variable warning
 REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
+
+REGISTER_HASH(my_hash1);
+REGISTER_HASH(my_hash2);
+REGISTER_HASH(my_hash3);
+REGISTER_HASH(my_hash4);
+REGISTER_HASH(my_hash5);
+REGISTER_HASH(my_hash6);
+REGISTER_HASH(my_hash7);
+REGISTER_HASH(my_hash8);
+REGISTER_HASH(my_hash9);
+REGISTER_HASH(my_hash10);
 
 extern int import_primitives();
 
