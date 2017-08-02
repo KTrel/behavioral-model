@@ -140,12 +140,14 @@ class P4Switch(Switch):
             exit(1)
         info("P4 switch {} has been started.\n".format(self.name))
 
-    def stop(self):
+
+    def stop(self, delete_interface=True):
         "Terminate P4 switch."
         self.output.flush()
         self.cmd('kill %' + self.sw_path)
         self.cmd('wait')
-        self.deleteIntfs()
+        if delete_interface:
+            self.deleteIntfs()
 
     def attach(self, intf):
         "Connect a data port"
