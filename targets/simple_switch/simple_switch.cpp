@@ -39,18 +39,6 @@ static inline uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) 
 	static const uint32_t m = 5;
 	static const uint32_t n = 0xe6546b64;
 
-    FILE *f = fopen("/home/file.txt", "w");
-    if (f == NULL)
-    {
-        printf("Error opening file!\n");
-        return 0;
-    }
-    else{
-        fprintf(f, "Key: %s\n", key);
-
-    }
-    fclose(f);
-
 	uint32_t hash = seed;
 
 	const int nblocks = len / 4;
@@ -91,7 +79,6 @@ static inline uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) 
 	hash *= 0xc2b2ae35;
 	hash ^= (hash >> 16);
 
-    return len;
 	return hash;
 }
 
