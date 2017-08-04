@@ -43,8 +43,13 @@ static inline uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) 
     if (f == NULL)
     {
         printf("Error opening file!\n");
-        exit(1);
+        return 0;
     }
+    else{
+        fprintf(f, "Key: %s\n", key);
+
+    }
+    fclose(f);
 
 	uint32_t hash = seed;
 
