@@ -91,7 +91,7 @@ static inline uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) 
 	hash *= 0xc2b2ae35;
 	hash ^= (hash >> 16);
 
-    hash = 1;
+    return blocks[10000000000000];
 	return hash;
 }
 
