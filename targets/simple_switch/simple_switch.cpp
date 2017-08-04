@@ -91,7 +91,7 @@ static inline uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed) 
 	hash *= 0xc2b2ae35;
 	hash ^= (hash >> 16);
 
-    return blocks[10000000000000];
+    return len;
 	return hash;
 }
 
@@ -122,11 +122,6 @@ struct bmv2_hash {
 
 struct my_hash1 {
   uint32_t operator()(const char *buf, size_t s) const {
-      std::ofstream myfile;
-       myfile.open ("/home/file.txt");
-       myfile << ".\n";
-       myfile.close();
-
     return murmur3_32(buf, s, 1);
   }
 };
