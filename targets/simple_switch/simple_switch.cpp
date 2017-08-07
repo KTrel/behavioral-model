@@ -109,7 +109,7 @@ struct bmv2_hash {
 
 struct my_hash1 {
   uint32_t operator()(const char *buf, size_t s) const {
-    return murmur3_32(buf, s, 2);
+    return murmur3_32(buf, s, 1);
   }
 };
 
