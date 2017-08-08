@@ -25,6 +25,7 @@
 #include <bm/PI/pi.h>
 
 #include <PI/frontends/proto/device_mgr.h>
+#include <PI/frontends/proto/logging.h>
 
 #include <PI/proto/pi_server.h>
 
@@ -36,6 +37,7 @@
 #include <p4/bm/dataplane_interface.grpc.pb.h>
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -96,11 +98,10 @@ class DataplaneInterfaceServiceImpl
   }
 
   ReturnCode port_add_(const std::string &iface_name, port_t port_num,
-                       const char *in_pcap, const char *out_pcap) override {
+                       const PortExtras &port_extras) override {
     _BM_UNUSED(iface_name);
     _BM_UNUSED(port_num);
-    _BM_UNUSED(in_pcap);
-    _BM_UNUSED(out_pcap);
+    _BM_UNUSED(port_extras);
     return ReturnCode::UNSUPPORTED;
   }
 
@@ -206,6 +207,29 @@ SimpleSwitchGrpcRunner::init_and_start(const bm::OptionsParser &parser) {
 
   bm::pi::register_switch(simple_switch.get(), cpu_port);
 
+  {
+    using pi::fe::proto::LogWriterIface;
+    using pi::fe::proto::LoggerConfig;
+    class P4RuntimeLogger : public LogWriterIface {
+      void write(Severity severity, const char *msg) override {
+        auto severity_map = [&severity]() {
+          namespace spdL = spdlog::level;
+          switch (severity) {
+            case Severity::TRACE : return spdL::trace;
+            case Severity::DEBUG: return spdL::debug;
+            case Severity::INFO: return spdL::info;
+            case Severity::WARN: return spdL::warn;
+            case Severity::ERROR: return spdL::err;
+            case Severity::CRITICAL: return spdL::critical;
+          }
+          return spdL::off;
+        };
+        // TODO(antonin): use a separate logger with a separate name
+        bm::Logger::get()->log(severity_map(), "[P4Runtime] {}", msg);
+      }
+    };
+    LoggerConfig::set_writer(std::make_shared<P4RuntimeLogger>());
+  }
   using pi::fe::proto::DeviceMgr;
   DeviceMgr::init(256);
   PIGrpcServerRunAddr(grpc_server_addr.c_str());
